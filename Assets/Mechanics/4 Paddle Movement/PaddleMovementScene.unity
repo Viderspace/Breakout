@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43f14401f56304d6d807d5ff06ebf3f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  paddleSpeed: 24.4
 --- !u!1001 &1854954825
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -357,8 +357,12 @@ PrefabInstance:
       value: -0.0012761354
       objectReference: {fileID: 0}
     - target: {fileID: 5157234076804307841, guid: 0f995e47d2e77458891a4c561127deaa, type: 3}
+      propertyPath: m_Mass
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5157234076804307841, guid: 0f995e47d2e77458891a4c561127deaa, type: 3}
       propertyPath: m_LinearDrag
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5157234076804307841, guid: 0f995e47d2e77458891a4c561127deaa, type: 3}
       propertyPath: m_Constraints

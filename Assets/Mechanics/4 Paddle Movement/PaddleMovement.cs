@@ -1,59 +1,57 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PaddleMovement : MonoBehaviour
 {
+    private Rigidbody2D _rigidbody2D;
+    private bool LeftisPressed;
+    private bool RightisPressed;
 
-    private Rigidbody2D rigidBody;
-    private int _direction  = 0;
-    public float speed = 3;
+    //allows to adjust paddle speed from inspector
+    [Range(1,30)]
+    public float paddleSpeed;
 
 
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        rigidBody = GetComponent<Rigidbody2D>();
+        _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Player wants to move Paddle left
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
         {
-            _direction = -1;
+            LeftisPressed = true;
+            RightisPressed = false;
         }
-        // Player wants to move Paddle right
-        else if (Input.GetKey(KeyCode.RightArrow))
+        else if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow))
         {
-            _direction = 1;
+            RightisPressed = true;
+            LeftisPressed = false;
         }
-        // no movement
         else
         {
-            _direction = 0;
+            RightisPressed = false;
+            LeftisPressed = false;
+        }
+
+    }
+
+    private void FixedUpdate()
+    {
+        if (LeftisPressed)
+        {
+            _rigidbody2D.AddRelativeForce(Vector3.left * paddleSpeed  );
+        }
+        else if (RightisPressed)
+        {
+            _rigidbody2D.AddRelativeForce(Vector3.right * paddleSpeed  );
         }
     }
-    
-    
-    
-//     private void FixedUpdate()
-//     {
-//         if (_direction == 0)
-//         {
-//         }
-//     }
-//     
-//     
-//     
-//     
 }
-
-
 
 
