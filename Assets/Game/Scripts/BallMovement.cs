@@ -3,16 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallBehavior : MonoBehaviour
+public class BallMovement : MonoBehaviour
 {
-    public Rigidbody2D physics = default;
+    public Rigidbody2D physics;
     private Vector2 _prevVelocity;
     
-    // slider for adjusting the ball's speed (in inspector)
+    // slider (in inspector) for adjusting the ball's speed 
     [Range(0.0f, 30.0f)]
     public float movementSpeed = 5f;
     
-
 
     private void OnCollisionEnter2D(Collision2D other)
     {
@@ -25,8 +24,7 @@ public class BallBehavior : MonoBehaviour
     
     void Awake()
     {
+        physics.gravityScale = 0;
         physics.velocity = _prevVelocity = new Vector2(movementSpeed, movementSpeed);
     }
-    
 }
-
