@@ -8,6 +8,7 @@ TagManager:
   - Block
   - Middle Block
   - WORLD
+  - MidRowBlock
   layers:
   - Default
   - TransparentFX

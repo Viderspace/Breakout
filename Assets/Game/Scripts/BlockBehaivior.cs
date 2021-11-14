@@ -2,23 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockBehaivior : GameManager
+public class BlockBehaivior : MonoBehaviour
 {
-    
+    private SpriteRenderer _spriteRenderer;
+
     private void OnCollisionEnter2D()
     {
-        gameObject.SetActive(false);
-        ReduceBlock();
+        FindObjectOfType<BricksManager>().ReduceBlock();
+        Destroy(gameObject);
     }
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetColor(Color color)
     {
-        
+        _spriteRenderer.color = color;
     }
+
 }

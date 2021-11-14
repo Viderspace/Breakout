@@ -11,7 +11,7 @@ public class PaddleMovement : MonoBehaviour
     private bool RightisPressed;
 
     //allows to adjust paddle speed from inspector
-    [Range(1,30)]
+    [Range(1,200)]
     public float paddleSpeed;
 
 
@@ -43,11 +43,11 @@ public class PaddleMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (LeftisPressed)
+        if (LeftisPressed && !RightisPressed)
         {
             _rigidbody2D.AddRelativeForce(Vector3.left * paddleSpeed  );
         }
-        else if (RightisPressed)
+        else if (RightisPressed && !LeftisPressed) 
         {
             _rigidbody2D.AddRelativeForce(Vector3.right * paddleSpeed  );
         }

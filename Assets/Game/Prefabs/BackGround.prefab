@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7755834509591511405}
   - component: {fileID: 7755834509591511406}
-  - component: {fileID: 7755834509591511404}
+  - component: {fileID: 8790237492865857466}
   m_Layer: 0
   m_Name: BackGround
   m_TagString: WORLD
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7755834509591511404
+--- !u!114 &8790237492865857466
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -93,7 +93,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7755834509591511392}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a3db474fa716467bb1b23ff95f2471e, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c7cc861b5d1b43a7a1a3f9a4c7f9f4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 7755834509591511406}

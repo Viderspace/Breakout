@@ -12,6 +12,10 @@ public class GameManager : MonoBehaviour
     public static bool _gameIsPaused = false;
     public static bool _victory = false;
 
+    public void PauseResumeGame()
+    {
+        _gameIsPaused = !_gameIsPaused;
+    }
 
 
 
@@ -35,7 +39,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        _gameIsPaused = true;
+        PauseResumeGame();
 
         // TODO : when player still have some lives left:
         // 1. set "lives remaining" animation on screen

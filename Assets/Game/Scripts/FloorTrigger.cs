@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FloorTrigger : GameManager
+public class FloorTrigger : MonoBehaviour
 {
 
 
-    private void OnTriggerEnter2D()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        BallEscaped();
-        
+        other.GetComponent<BallMovement>().Respwan();
+        FindObjectOfType<LivesManager>().ReduceLife();
     }
 }
