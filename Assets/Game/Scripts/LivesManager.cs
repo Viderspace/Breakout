@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class LivesManager : MonoBehaviour
@@ -10,12 +11,16 @@ public class LivesManager : MonoBehaviour
     [SerializeField] private GameObject life1;
     [SerializeField] private GameObject life2;
     [SerializeField] private GameObject life3;
+    [SerializeField] private GameObject text;
+    
     #endregion
 
 
     #region Fields
     
     private static LivesManager _shared;
+
+    private bool _animationStart = false;
 
     #endregion
 
@@ -37,10 +42,43 @@ public class LivesManager : MonoBehaviour
     }
 
 
+    private void ReduceLifeAnimation()
+    {
+        
+        life1.GetComponent<Animator>().SetTrigger("LoseLife");
+        life2.GetComponent<Animator>().SetTrigger("LoseLife");
+        life3.GetComponent<Animator>().SetTrigger("LoseLife");
+        text.GetComponent<Animator>().SetTrigger("LoseLife");
+    }
 
 
     public void ReduceLife()
     {
+        _animationStart = true;
+        ReduceLifeAnimation();
+    }
+    
+
+
+
+    private void Awake()
+    {
+        _shared = this;
+    }
+
+    
+    private float _animationDuration = 1.0f;
+
+
+    private void Update()
+    {
+        if (!_animationStart) return;
+        if (_animationDuration > 0) 
+        {
+            _animationDuration -= Time.deltaTime;
+            return;
+        }
+            
         switch (LivesCount)
         {
             case 3:
@@ -54,14 +92,12 @@ public class LivesManager : MonoBehaviour
                 life1.SetActive(false);
                 Debug.Log("GAME OVER!  (LivesManager)");
                 break;
+                
         }
         LivesCount -= 1;
-    }
+        _animationDuration = 1.0f;
+        _animationStart = false;
 
 
-
-    private void Awake()
-    {
-        _shared = this;
     }
 }

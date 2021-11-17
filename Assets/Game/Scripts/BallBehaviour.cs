@@ -1,3 +1,4 @@
+using UnityEditor.Animations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -106,15 +107,7 @@ public class BallBehaviour : MonoBehaviour
     }
 
     
-    // public void PauseBallMovement()
-    // {
-    //     _prevVelocity = physics.velocity;
-    //     physics.velocity = new Vector2(0, 0);
-    // }
-    // public void RestartBallMovement()
-    // {
-    //     physics.velocity = _prevVelocity;
-    // }
+
     
 
 
@@ -130,10 +123,11 @@ public class BallBehaviour : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        GetComponent<AudioSource>().Play();
         if (other.collider.name == "Paddle")
         {
             //TODO - the animator was deleted, I need to recreate it for this call to trigger the animation
-            // paddleAnimator.SetTrigger("PaddleBounce");
+            paddleAnimator.SetTrigger("Hit");
             if (!_maxSpeed)
             {
                 BallHitsPaddle();
