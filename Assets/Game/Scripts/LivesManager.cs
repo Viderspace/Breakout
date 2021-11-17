@@ -14,7 +14,6 @@ public class LivesManager : MonoBehaviour
         {
             Debug.Log("GAME OVER!  (LivesManager)");
             NewGame();
-            
         }
     }
 
@@ -24,10 +23,7 @@ public class LivesManager : MonoBehaviour
         for (int lifeObject = 0; lifeObject < _livesCount; lifeObject++)
         {
             gameObject.transform.GetChild(lifeObject).gameObject.SetActive(true);
-            FindObjectOfType<BricksManager>().ResetLevel();
+            FindObjectOfType<BlocksManager>().ResetLevel();
         }
     }
-    
-    
-    
 }

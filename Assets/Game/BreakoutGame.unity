@@ -3269,9 +3269,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b52d25c495f8469a9165ea1459265b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizonSpacing: 0.1
-  verticSpacing: 0.2
   brickPrefab: {fileID: 4560431556224765263, guid: e8147235514b54a42963d3c6c39b2f8e, type: 3}
+  animationTime: 0.2
 --- !u!4 &1307547554
 Transform:
   m_ObjectHideFlags: 0

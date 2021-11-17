@@ -9,7 +9,7 @@ public class FloorTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        other.GetComponent<BallMovement>().Respwan();
+        other.GetComponent<BallBehaviour>().Respawn();
         FindObjectOfType<LivesManager>().ReduceLife();
     }
 }
