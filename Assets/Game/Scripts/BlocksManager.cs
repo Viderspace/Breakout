@@ -70,6 +70,7 @@ public class BlocksManager : MonoBehaviour
 
     public void ResetLevel()
     {
+        _diagonalIndex = 0;
         foreach (var brick in _bricks)
         {
             Destroy(brick);

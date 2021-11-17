@@ -1,29 +1,67 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class LivesManager : MonoBehaviour
 {
-    private int _livesCount = 3;
+    #region Inspector
+
+    [SerializeField] private GameObject life1;
+    [SerializeField] private GameObject life2;
+    [SerializeField] private GameObject life3;
+    #endregion
+
+
+    #region Fields
+    
+    private static LivesManager _shared;
+
+    #endregion
+
+    #region Properties
+    public int LivesCount { get; set; }
+
+    #endregion
+    
+    
+    
+    
+    
+    public void ActivateLives()
+    {
+        life1.SetActive(true);
+        life2.SetActive(true);
+        life3.SetActive(true);
+        LivesCount = 3;
+    }
+
+
+
 
     public void ReduceLife()
     {
-        _livesCount -= 1;
-        gameObject.transform.GetChild(_livesCount).gameObject.SetActive(false);
-        if (_livesCount == 0)
+        switch (LivesCount)
         {
-            Debug.Log("GAME OVER!  (LivesManager)");
-            NewGame();
+            case 3:
+                life3.SetActive(false);
+
+                break;
+            case 2:
+                life2.SetActive(false);
+                break;
+            case 1:
+                life1.SetActive(false);
+                Debug.Log("GAME OVER!  (LivesManager)");
+                break;
         }
+        LivesCount -= 1;
     }
 
-    public void NewGame()
+
+
+    private void Awake()
     {
-        _livesCount = 3;
-        for (int lifeObject = 0; lifeObject < _livesCount; lifeObject++)
-        {
-            gameObject.transform.GetChild(lifeObject).gameObject.SetActive(true);
-            FindObjectOfType<BlocksManager>().ResetLevel();
-        }
+        _shared = this;
     }
 }

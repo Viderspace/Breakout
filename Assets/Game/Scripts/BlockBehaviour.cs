@@ -27,7 +27,7 @@ public class BlockBehaviour : MonoBehaviour
     void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        this.transform.localScale = new Vector3(0, 0, 0);
+        transform.localScale = new Vector3(0, 0, 0);
         _animationDone = false;
     }
 
@@ -57,7 +57,7 @@ public class BlockBehaviour : MonoBehaviour
     public void SetColor(Color color)
     {
         _spriteRenderer.color = color;
-        Debug.Log(this.Coordinates);
+        // Debug.Log(this.Coordinates);
     }
 
     #endregion

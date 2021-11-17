@@ -5,11 +5,10 @@ using UnityEngine;
 
 public class FloorTrigger : MonoBehaviour
 {
-
+    [SerializeField] private GameManager _gameManager;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        other.GetComponent<BallBehaviour>().Respawn();
-        FindObjectOfType<LivesManager>().ReduceLife();
+        _gameManager.BallFell();
     }
 }

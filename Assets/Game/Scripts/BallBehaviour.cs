@@ -4,6 +4,7 @@ using Random = UnityEngine.Random;
 public class BallBehaviour : MonoBehaviour
 {
     #region Inspector
+    
 
     [SerializeField] private Animator paddleAnimator;
 
@@ -83,17 +84,47 @@ public class BallBehaviour : MonoBehaviour
     {
         physics.gravityScale = 0;
         Respawn();
-        FindObjectOfType<BlocksManager>().ResetLevel();
     }
+
+    public void PauseResumeBall(bool pause)
+    {
+        if (!pause && physics.velocity.magnitude < 0.1) //ball is at init position
+        {
+            physics.velocity = _prevVelocity = RandomDirection();
+            return;
+        }
+        if (!pause && physics.velocity.magnitude > 0.1)
+        {
+            _prevVelocity = physics.velocity;
+            physics.velocity = new Vector2(0, 0);
+            return;
+        }
+        physics.velocity = _prevVelocity;
+
+
+
+    }
+
+    
+    // public void PauseBallMovement()
+    // {
+    //     _prevVelocity = physics.velocity;
+    //     physics.velocity = new Vector2(0, 0);
+    // }
+    // public void RestartBallMovement()
+    // {
+    //     physics.velocity = _prevVelocity;
+    // }
+    
 
 
     private void Update()
     {
-        //TODO : add a condition here below (from GameManager), so that the ball cant start move during the blocks animation 
-        if (Input.GetKeyUp(KeyCode.Space) && physics.velocity.magnitude < 0.1)
-        {
-            physics.velocity = _prevVelocity = RandomDirection();
-        }
+        // //TODO : add a condition here below (from GameManager), so that the ball cant start move during the blocks animation 
+        // if (Input.GetKeyUp(KeyCode.Space) && physics.velocity.magnitude < 0.1)
+        // {
+        //     physics.velocity = _prevVelocity = RandomDirection();
+        // }
     }
 
 

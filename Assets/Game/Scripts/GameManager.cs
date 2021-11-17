@@ -4,61 +4,121 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    #region Inspector
+
+    [SerializeField] private BlocksManager _blocksManager;
+    [SerializeField] private BallBehaviour _ballBehaviour;
+    [SerializeField] private PaddleBehaviour _paddleBehaviour;
+    [SerializeField] private LivesManager _livesManager;
+
+    #endregion
+
+
+    #region Fields
+
+    private static GameManager _shared;
+
+    //Game Stats:
+    private bool _gameOver;
+    private bool _gameIsPaused;
+    private bool _victory;
+
+    // private  int _blocksRemaining = 55;
     
-    private static int _lives = 3;
-    private static int _blocksRemaining = 55;
-    
-    public static bool _gameOver = false;
-    public static bool _gameIsPaused = false;
-    public static bool _victory = false;
+    #endregion
+
+
+    #region Methods
 
     public void PauseResumeGame()
     {
         _gameIsPaused = !_gameIsPaused;
+
+        _ballBehaviour.PauseResumeBall(_gameIsPaused);
+        // if (_gameIsPaused)
+        // {
+        //     _ballBehaviour.PauseBallMovement();
+        // }
+        // else
+        // {
+        //     _ballBehaviour.RestartBallMovement();
+        // }
     }
 
 
+    // public void BallEscaped()
+    //     // this function is called only by "invisible floor" object.
+    //     //when the ball escapes it triggers the floor to reset the game
+    // {
+    //     Debug.Log("ball escaped (manager)");
+    //     _lives -= 1;
+    //     if (_lives == 0)
+    //     {
+    //         Debug.Log(_lives);
+    //         _gameOver = true;
+    //         return;
+    //     }
+    //
+    //     PauseResumeGame();
+    //
+    //     // TODO : when player still have some lives left:
+    //     // 1. set "lives remaining" animation on screen
+    //     // 2. reset ball to init position
+    //     // 3. hold the ball still until space key is pressed
+    // }
 
-    public void ReduceBlock() 
-        // when a block is hit by the ball it deactivates itself, and calls this function 
+    #endregion
+
+    private void InitGame()
     {
-        _blocksRemaining -= 1;
+        _blocksManager.ResetLevel();
+        _livesManager.ActivateLives();
+        _ballBehaviour.Respawn();
+        _gameOver = false; 
+        _gameIsPaused = true; 
+        _victory = false;
+        
+        
+
     }
-    
-    
-    public void BallEscaped()
-    // this function is called only by "invisible floor" object.
-    //when the ball escapes it triggers the floor to reset the game
+
+    public void BallFell()
     {
-        Debug.Log("ball escaped (manager)");
-        _lives -= 1;
-        if (_lives == 0)
+        _gameIsPaused = true;
+        _livesManager.ReduceLife();
+        if (_livesManager.LivesCount > 0)
         {
-            Debug.Log(_lives);
-            _gameOver = true;
+            _ballBehaviour.Respawn();
             return;
         }
-
-        PauseResumeGame();
-
-        // TODO : when player still have some lives left:
-        // 1. set "lives remaining" animation on screen
-        // 2. reset ball to init position
-        // 3. hold the ball still until space key is pressed
-
-
-
+        _gameOver = true;
+        InitGame();
     }
-        
-    // Start is called before the first frame update
+
+    
+
+    
+    
+    
+
+    #region MonoBehaviour
+
     void Awake()
     {
-
+        _shared = this;
+        InitGame();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyUp(KeyCode.Space) )
+        {
+            PauseResumeGame();
+        }
     }
+
+    #endregion
+
+
 }
