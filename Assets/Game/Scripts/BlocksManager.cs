@@ -3,41 +3,46 @@ using UnityEngine;
 
 
 public class BlocksManager : MonoBehaviour
+// Hybrid manager, creates all blocks in game.
+// i chose to keep them in a list, and tag all middle blocks in a special "middle block" tag.
 {
     #region Inspector
 
-    [SerializeField] private GameObject brickPrefab = default;
-
-    [SerializeField] [Range(0.001f, 1f)] private float animationTime = 0.2f;
+    [SerializeField] private GameManager gameManager;
+    [SerializeField] private GameObject brickPrefab;
 
     #endregion
 
 
     #region Fields
 
-    private static BlocksManager _shared;
-
-    private readonly List<GameObject> _bricks = new List<GameObject>();
-
-
-    //parameters for blocks animation
-    private int _diagonalIndex = 0;
-    private float _remaining = 0f;
+    private readonly List<GameObject> _bricks = new List<GameObject>(); // I keep all blocks here
+    private float _animationTime;
 
 
-    //parameters for creating a grid of block   (rows, columns, the spacing between them in the grid)
-    private int rows = 5;
-    private int cols = 11;
-    private float horizonSpacing = 0.1f;
-    private float verticSpacing = 0.2f;
+    //utilities for the procedural blocks animation
+    private int _diagonalIndex;
+    private float _remaining;
 
-    // to keep track of the current state of the grid
+
+    //parameters for creating a grid of block (rows, columns, the spacing between them in the grid)
+    private const int Rows = 5;
+    private const int Cols = 11;
+    private const float HorizonSpacing = 0.1f;
+    private const float VerticSpacing = 0.2f;
+
+
+    // i keep track of the current state of the grid with this variable
     private int _blocksRemaining = 55;
+
+    #endregion
+
+    #region Properties
 
     public int BlocksRemaining
     {
         get => _blocksRemaining;
-        private set => _blocksRemaining -= value;
+        set => _blocksRemaining -= value;
     }
 
     #endregion
@@ -49,9 +54,10 @@ public class BlocksManager : MonoBehaviour
     {
         _bricks.Remove(block);
         _blocksRemaining -= 1;
-        if (_blocksRemaining != 0) return;
-        Debug.Log("WIN!");
-        ResetLevel();
+        // if (_blocksRemaining != 0) return;
+        // Debug.Log("WIN!");
+        // _gameManager.Win = true;
+        // ResetLevel();
     }
 
     private void AnimateDiagonalBlocks(int diagIndex)
@@ -71,6 +77,7 @@ public class BlocksManager : MonoBehaviour
     public void ResetLevel()
     {
         _diagonalIndex = 0;
+        _remaining = 0f;
         foreach (var brick in _bricks)
         {
             Destroy(brick);
@@ -79,15 +86,15 @@ public class BlocksManager : MonoBehaviour
         _bricks.Clear();
 
 
-        for (var y = 0; y < rows; y++)
+        for (var y = 0; y < Rows; y++)
         {
             var color = GetColorFromString(_rowColors[y]);
-            for (var x = 0; x < cols; x++)
+            for (var x = 0; x < Cols; x++)
             {
                 var localScale = brickPrefab.transform.localScale;
                 var spawnPos = (Vector2) transform.position + new Vector2(
-                    x * (localScale.x + horizonSpacing),
-                    -y * (localScale.y + verticSpacing));
+                    x * (localScale.x + HorizonSpacing),
+                    -y * (localScale.y + VerticSpacing));
 
                 var brick = Instantiate(brickPrefab, spawnPos, Quaternion.identity);
                 if (y == 2)
@@ -111,7 +118,7 @@ public class BlocksManager : MonoBehaviour
 
     private void Awake()
     {
-        _shared = this;
+        _animationTime = gameManager.blocksAnimationTime;
     }
 
 
@@ -128,7 +135,7 @@ public class BlocksManager : MonoBehaviour
 
         AnimateDiagonalBlocks(_diagonalIndex);
         _diagonalIndex += 1;
-        _remaining = animationTime;
+        _remaining = _animationTime;
     }
 
     #endregion
@@ -143,14 +150,14 @@ public class BlocksManager : MonoBehaviour
     // helper functions: 
     private static int HexToDec(string hex)
     {
-        int dec = System.Convert.ToInt32(hex, 16);
+        var dec = System.Convert.ToInt32(hex, 16);
         return dec;
     }
 
-    private static string DecToHex(int value)
-    {
-        return value.ToString("X2");
-    }
+    // private static string DecToHex(int value)
+    // {
+    //     return value.ToString("X2");
+    // }
 
     private float HexToFloatNormalized(string hex)
     {

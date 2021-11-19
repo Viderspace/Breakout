@@ -1,15 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 public class GameManager : MonoBehaviour
 {
     #region Inspector
 
-    [SerializeField] private BlocksManager _blocksManager;
-    [SerializeField] private BallBehaviour _ballBehaviour;
-    [SerializeField] private PaddleBehaviour _paddleBehaviour;
-    [SerializeField] private LivesManager _livesManager;
+    [SerializeField] private BlocksManager blocksManager;
+    [SerializeField] private BallBehaviour ballBehaviour;
+    [SerializeField] private PaddleBehaviour paddleBehaviour;
+    [SerializeField] private Animator paddleAnimator;
+    [SerializeField] private LivesManager livesManager;
+    [SerializeField] private GameObject gameOverWindow;
+    [SerializeField] private GameObject winWindow;
+    [SerializeField] private Camera mainCam;
+    [SerializeField] private AudioManager audioManager;
+
+    [Header("Game controls")] [SerializeField] [Range(1, 200)]
+    public float paddleSpeed = 20f;
+
+    [SerializeField] [Range(0.5f, 5f)] public float ballSpeed = 3f;
+
+    [Header("Visual controls")] [SerializeField] [Range(0.001f, 1f)]
+    public float blocksAnimationTime = 0.2f;
 
     #endregion
 
@@ -17,108 +29,172 @@ public class GameManager : MonoBehaviour
     #region Fields
 
     private static GameManager _shared;
-
-    //Game Stats:
     private bool _gameOver;
-    private bool _gameIsPaused;
-    private bool _victory;
+    private bool _win;
 
-    // private  int _blocksRemaining = 55;
-    
+
+    public enum BallSpeedFactor
+    {
+        Original = 1,
+        Twice = 2,
+        Trice = 3,
+        Max = 4
+    }
+
+    public BallSpeedFactor ballSpeedFactor;
+
+    #endregion
+
+
+    #region Properties
+
+    private bool GameOver
+    {
+        get => _gameOver;
+        set
+        {
+            _gameOver = value;
+            gameOverWindow.SetActive(true);
+        }
+    }
+
+    private bool Win
+    {
+        get => _win;
+        set
+        {
+            _win = value;
+            if (value)
+            {
+                Debug.Log("Win!");
+                winWindow.SetActive(true);
+                PauseGame();
+            }
+        }
+    }
+
     #endregion
 
 
     #region Methods
 
-    public void PauseResumeGame()
+    private void PauseGame()
     {
-        _gameIsPaused = !_gameIsPaused;
-
-        _ballBehaviour.PauseResumeBall(_gameIsPaused);
-        // if (_gameIsPaused)
-        // {
-        //     _ballBehaviour.PauseBallMovement();
-        // }
-        // else
-        // {
-        //     _ballBehaviour.RestartBallMovement();
-        // }
+        ballBehaviour.PauseBall();
+        paddleBehaviour.DeactivatePaddle();
     }
 
+    private void ResumeGame()
+    {
+        ballBehaviour.ResumeBall();
+        audioManager.PlaySound("Ball Launch");
+        paddleBehaviour.ActivatePaddle();
+    }
 
-    // public void BallEscaped()
-    //     // this function is called only by "invisible floor" object.
-    //     //when the ball escapes it triggers the floor to reset the game
-    // {
-    //     Debug.Log("ball escaped (manager)");
-    //     _lives -= 1;
-    //     if (_lives == 0)
-    //     {
-    //         Debug.Log(_lives);
-    //         _gameOver = true;
-    //         return;
-    //     }
-    //
-    //     PauseResumeGame();
-    //
-    //     // TODO : when player still have some lives left:
-    //     // 1. set "lives remaining" animation on screen
-    //     // 2. reset ball to init position
-    //     // 3. hold the ball still until space key is pressed
-    // }
-
-    #endregion
 
     private void InitGame()
     {
-        _blocksManager.ResetLevel();
-        _livesManager.ActivateLives();
-        _ballBehaviour.Respawn();
-        _gameOver = false; 
-        _gameIsPaused = true; 
-        _victory = false;
-        
-        
-
+        GameOver = false;
+        Win = false;
+        gameOverWindow.SetActive(false);
+        winWindow.SetActive(false);
+        blocksManager.ResetLevel();
+        livesManager.ActivateAllLives();
+        ballBehaviour.Respawn();
+        PauseGame();
+        gameOverWindow.SetActive(false);
+        audioManager.PlaySound("InitGame");
     }
 
-    public void BallFell()
+    public void BallEscaped()
     {
-        _gameIsPaused = true;
-        _livesManager.ReduceLife();
-        if (_livesManager.LivesCount > 0)
+        paddleBehaviour.InitPosition();
+        PauseGame();
+        livesManager.ReduceLife();
+
+        if (livesManager.LivesCount == 0)
         {
-            _ballBehaviour.Respawn();
+            GameOver = true;
             return;
         }
-        _gameOver = true;
-        InitGame();
+
+        mainCam.GetComponent<Animator>().SetTrigger("Ball Escaped Shake");
+        audioManager.PlaySound("BallEscaped");
+        ballBehaviour.Respawn();
     }
 
-    
 
-    
-    
-    
+    public void BallCollision(Collision2D other)
+    {
+        if (other.collider.name == "Paddle")
+        {
+            paddleAnimator.SetTrigger("Hit");
+            audioManager.PlaySound("Paddle Hit");
+
+            if (ballSpeedFactor == BallSpeedFactor.Max)
+            {
+                return;
+            }
+
+            ballBehaviour.PaddleHitsSpeedBoost();
+        }
+
+        else if (other.collider.CompareTag("MidRowBlock"))
+        {
+            if (BallSpeedFactor.Max != ballSpeedFactor)
+            {
+                ballSpeedFactor = BallSpeedFactor.Max;
+                audioManager.PlaySound("SpeedBoost");
+                ballBehaviour.BallHitsMiddleBlock();
+                return;
+            }
+
+            audioManager.PlaySound("BlockHit");
+        }
+        else if (other.collider.CompareTag("WORLD"))
+        {
+            audioManager.PlaySound("Wall Hit");
+        }
+        else if (other.collider.CompareTag("Block"))
+        {
+            audioManager.PlaySound("BlockHit");
+        }
+
+        if (blocksManager.BlocksRemaining == 0)
+        {
+            Win = true;
+        }
+    }
+
+    #endregion
+
 
     #region MonoBehaviour
 
-    void Awake()
+    private void Awake()
     {
         _shared = this;
         InitGame();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space) )
+        if (!Input.GetKeyUp(KeyCode.Space)) return;
+        if (GameOver || Win)
         {
-            PauseResumeGame();
+            InitGame();
+            return;
         }
+
+        if (ballBehaviour.ballIsActive == false)
+        {
+            ResumeGame();
+            return;
+        }
+
+        PauseGame();
     }
 
     #endregion
-
-
 }

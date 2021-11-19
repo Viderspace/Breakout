@@ -9,6 +9,6 @@ public class FloorTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        _gameManager.BallFell();
+        _gameManager.BallEscaped();
     }
 }

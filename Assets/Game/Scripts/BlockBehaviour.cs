@@ -7,24 +7,31 @@ public class BlockBehaviour : MonoBehaviour
 
     private SpriteRenderer _spriteRenderer;
 
-
     //animation related
     [NonSerialized] public Vector2Int Coordinates;
     public bool animationTrigger = false;
     private bool _animationDone = false;
     private float _growingFactor = 0.0f;
-    private float growingSpeed = 2.5f;
+    private readonly float growingSpeed = 2.5f;
 
     // fixed size localScale for a block:
-    private float xScale = 1.472534f;
-    private float yScale = 0.28776f;
+    private const float XScale = 1.472534f;
+    private const float YScale = 0.28776f;
 
     #endregion
 
+    #region Methods
 
+    public void SetColor(Color color)
+    {
+        _spriteRenderer.color = color;
+    }
+
+    #endregion
+    
     #region MonoBehavior
 
-    void Awake()
+    private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         transform.localScale = new Vector3(0, 0, 0);
@@ -33,31 +40,21 @@ public class BlockBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (_animationDone || !animationTrigger)
-        {
-            return;
-        }
+        if (_animationDone || !animationTrigger) return;
 
         _growingFactor += Time.deltaTime * growingSpeed;
+        _spriteRenderer.transform.localScale = new Vector3(XScale * _growingFactor, YScale * _growingFactor, 0);
 
-        _spriteRenderer.transform.localScale = new Vector3(xScale * _growingFactor, yScale * _growingFactor, 0);
-        if (_growingFactor >= 1f)
-        {
-            _spriteRenderer.transform.localScale = new Vector3(xScale, yScale, 0);
-            _animationDone = true;
-        }
+        if (!(_growingFactor >= 1f)) return;
+        _spriteRenderer.transform.localScale = new Vector3(XScale, YScale, 0);
+        _animationDone = true;
     }
 
     private void OnCollisionEnter2D()
     {
-        FindObjectOfType<BlocksManager>().ReduceBlock(gameObject);
+        BlocksManager blocksManager = FindObjectOfType<BlocksManager>();
+        blocksManager.ReduceBlock(gameObject);
         Destroy(gameObject);
-    }
-
-    public void SetColor(Color color)
-    {
-        _spriteRenderer.color = color;
-        // Debug.Log(this.Coordinates);
     }
 
     #endregion

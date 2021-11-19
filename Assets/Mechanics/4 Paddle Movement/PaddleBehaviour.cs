@@ -1,67 +1,72 @@
+using System;
 using UnityEngine;
+
 
 public class PaddleBehaviour : MonoBehaviour
 {
+    [SerializeField] private GameManager _gameManager;
+
+
     #region Fields
 
     private Rigidbody2D _rigidbody2D;
-
+    private readonly Vector3 _initPosition = new Vector3(0, -4.5f, 0);
+    private float _move = 0f;
+    private float _paddleSpeed;
     private State _currentState;
 
-    enum State
+    public enum State
     {
-        Idle,
-        Left,
-        Right
+        Disabled,
+        Enabled
     }
 
     #endregion
 
 
-    #region Inspector
+    #region Methods
 
-    [SerializeField] [Range(1, 200)] private float paddleSpeed;
+    public void InitPosition()
+    {
+        transform.position = _initPosition;
+        DeactivatePaddle();
+    }
+
+    public void DeactivatePaddle()
+    {
+        _currentState = State.Disabled;
+    }
+
+    public void ActivatePaddle()
+    {
+        _currentState = State.Enabled;
+    }
 
     #endregion
-
 
     #region MonoBehaviour
 
     private void Awake()
     {
+        _currentState = State.Disabled;
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _paddleSpeed = _gameManager.paddleSpeed;
     }
 
-    // Update is called once per frame
+
     private void Update()
     {
-        if (Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
-        {
-            _currentState = State.Left;
-            return;
-        }
-        if (Input.GetKey(KeyCode.RightArrow) && !Input.GetKey(KeyCode.LeftArrow))
-        {
-            _currentState = State.Right;
-            return;
-        }
-        _currentState = State.Idle;
+        if (_currentState == State.Disabled) return;
+
+        _move = Input.GetAxisRaw("Horizontal");
     }
 
     private void FixedUpdate()
     {
-        switch (_currentState)
-        {
-            case State.Left:
-                _rigidbody2D.AddForce(Vector3.left * paddleSpeed);
-                break;
-            case State.Right:
-                _rigidbody2D.AddForce(Vector3.right * paddleSpeed);
-                break;
-        }
+        if (_currentState == State.Disabled) return;
+
+        _rigidbody2D.AddForce(new Vector2(_move * _paddleSpeed, 0));
     }
 
     #endregion
 }
-
-

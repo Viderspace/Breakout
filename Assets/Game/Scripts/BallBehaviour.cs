@@ -1,17 +1,14 @@
-using UnityEditor.Animations;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(AudioManager))]
 public class BallBehaviour : MonoBehaviour
 {
     #region Inspector
-    
 
-    [SerializeField] private Animator paddleAnimator;
-
+    [SerializeField] private GameManager gameManager;
+    [SerializeField] private AudioManager audioManager;
     [SerializeField] private Rigidbody2D physics;
-
-    [SerializeField] [Range(0.5f, 5f)] private float initSpeed = 3f;
 
     #endregion
 
@@ -19,61 +16,78 @@ public class BallBehaviour : MonoBehaviour
     #region Fields
 
     private readonly Vector3 _initPos = new Vector3(0, -3.5f, 0);
-
+    private float _initSpeed;
+    public bool ballIsActive;
     private Vector2 _prevVelocity;
-
-    private bool _maxSpeed = false;
-
-    private int _paddleHitCount = 0;
+    public int PaddleHitCount { get; set; } = 0;
 
     #endregion
 
 
     #region Functions
 
-    private void BallHitsPaddle()
+    public void PaddleHitsSpeedBoost()
     {
-        _paddleHitCount += 1;
-        // Debug.Log($"hit count = {_paddleHitCount}");
-        switch (_paddleHitCount)
+        PaddleHitCount += 1;
+        switch (PaddleHitCount)
         {
             case 4:
-                _prevVelocity = _prevVelocity.normalized * initSpeed * 2;
-                Debug.Log("2X Speed");
+                _prevVelocity = _prevVelocity.normalized * _initSpeed * (int) GameManager.BallSpeedFactor.Twice;
+                gameManager.ballSpeedFactor = GameManager.BallSpeedFactor.Twice;
                 break;
             case 8:
-                _prevVelocity = _prevVelocity.normalized * initSpeed * 3;
-                Debug.Log("3X Speed");
+                _prevVelocity = _prevVelocity.normalized * _initSpeed * (int) GameManager.BallSpeedFactor.Trice;
+                gameManager.ballSpeedFactor = GameManager.BallSpeedFactor.Trice;
                 break;
             case 12:
-                _prevVelocity = _prevVelocity.normalized * initSpeed * 4;
-                _maxSpeed = true;
-                Debug.Log("4X Speed");
+                _prevVelocity = _prevVelocity.normalized * _initSpeed * (int) GameManager.BallSpeedFactor.Max;
+                gameManager.ballSpeedFactor = GameManager.BallSpeedFactor.Max;
                 break;
         }
     }
 
-    private void BallHitsMiddleBlock()
+    public void BallHitsMiddleBlock()
     {
-        _prevVelocity = _prevVelocity.normalized * initSpeed * 4;
-        _maxSpeed = true;
-        Debug.Log("4X Speed");
+        _prevVelocity = _prevVelocity.normalized * _initSpeed * (int) GameManager.BallSpeedFactor.Max;
     }
 
 
     public void Respawn()
     {
         transform.position = _initPos;
-        physics.velocity = new Vector2(0, 0);
-        _paddleHitCount = 0;
-        _maxSpeed = false;
+        physics.velocity = _prevVelocity = new Vector2(0, 0);
+        PaddleHitCount = 0;
+        gameManager.ballSpeedFactor = GameManager.BallSpeedFactor.Original;
+        ballIsActive = false;
     }
 
     private Vector2 RandomDirection()
     {
-        float xRand = Random.Range(-0.99f, 0.99f);
-        float yRand = Mathf.Sqrt(1 - xRand);
-        return new Vector2(xRand, yRand).normalized * initSpeed;
+        var xRand = Random.Range(-0.99f, 0.99f);
+        var yRand = Mathf.Sqrt(1 - xRand);
+        return new Vector2(xRand, yRand).normalized * _initSpeed;
+    }
+
+    public void PauseBall()
+    {
+        ballIsActive = false;
+        _prevVelocity = physics.velocity;
+        physics.velocity = new Vector2(0, 0);
+        audioManager.PlaySound("Pause Game");
+    }
+
+    public void ResumeBall()
+    {
+        if (transform.localPosition != _initPos)
+        {
+            physics.velocity = _prevVelocity;
+        }
+        else
+        {
+            physics.velocity = _prevVelocity = RandomDirection();
+        }
+
+        ballIsActive = true;
     }
 
     #endregion
@@ -83,67 +97,19 @@ public class BallBehaviour : MonoBehaviour
 
     private void Awake()
     {
+        _initSpeed = gameManager.ballSpeed;
         physics.gravityScale = 0;
         Respawn();
-    }
-
-    public void PauseResumeBall(bool pause)
-    {
-        if (!pause && physics.velocity.magnitude < 0.1) //ball is at init position
-        {
-            physics.velocity = _prevVelocity = RandomDirection();
-            return;
-        }
-        if (!pause && physics.velocity.magnitude > 0.1)
-        {
-            _prevVelocity = physics.velocity;
-            physics.velocity = new Vector2(0, 0);
-            return;
-        }
-        physics.velocity = _prevVelocity;
-
-
-
-    }
-
-    
-
-    
-
-
-    private void Update()
-    {
-        // //TODO : add a condition here below (from GameManager), so that the ball cant start move during the blocks animation 
-        // if (Input.GetKeyUp(KeyCode.Space) && physics.velocity.magnitude < 0.1)
-        // {
-        //     physics.velocity = _prevVelocity = RandomDirection();
-        // }
     }
 
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        GetComponent<AudioSource>().Play();
-        if (other.collider.name == "Paddle")
-        {
-            //TODO - the animator was deleted, I need to recreate it for this call to trigger the animation
-            paddleAnimator.SetTrigger("Hit");
-            if (!_maxSpeed)
-            {
-                BallHitsPaddle();
-            }
-        }
-
-
-        else if (other.collider.CompareTag("MidRowBlock") && !_maxSpeed)
-        {
-            BallHitsMiddleBlock();
-            Debug.Log("mid row hit!");
-        }
-
-        ContactPoint2D contact = other.contacts[0];
-        Vector2 contactNormal = contact.normal;
-        Vector2 newVelocity = Vector2.Reflect(_prevVelocity, contactNormal);
+        gameManager.BallCollision(other);
+        var contact = other.contacts[0];
+        // ContactPoint2D contact = other.GetContact(0);
+        var contactNormal = contact.normal;
+        var newVelocity = Vector2.Reflect(_prevVelocity, contactNormal);
         physics.velocity = newVelocity;
         _prevVelocity = newVelocity;
     }
