@@ -1,37 +1,12 @@
 using UnityEngine;
 
-
-public class BallTrail : MonoBehaviour
+namespace Game.Scripts
 {
-    #region Inspector
-
-    [SerializeField] private GameManager gameManager;
-    [SerializeField] private GameObject echo;
-
-    [Header("Animation Controls")]
-    [SerializeField] private float startTimeBtwSpawns;
-
-    #endregion
-    
-    private float _timeBtwSpawns;
-
-    #region MonoBehaviour
-
-    private void Update()
+    public class BallTrailDestroy : MonoBehaviour
     {
-        if (gameManager.ballSpeedFactor != GameManager.BallSpeedFactor.Max) return;
-
-        if (_timeBtwSpawns <= 0)
+        public void DestroyObject()
         {
-            //spawn echo ball object
-            GameObject instance = (GameObject) Instantiate(echo, transform.position, Quaternion.identity);
-            Destroy(instance, startTimeBtwSpawns);
-            _timeBtwSpawns = startTimeBtwSpawns / 4;
-            return;
+            Destroy(this);
         }
-
-        _timeBtwSpawns -= Time.deltaTime;
     }
-
-    #endregion
 }

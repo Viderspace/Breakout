@@ -1,14 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class FloorTrigger : MonoBehaviour
+namespace Game.Scripts
 {
-    [SerializeField] private GameManager _gameManager;
-
-    private void OnTriggerEnter2D(Collider2D other)
+    public class FloorTrigger : MonoBehaviour
     {
-        _gameManager.BallEscaped();
+        [SerializeField] private GameManager gameManager;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            gameManager.BallEscaped();
+        }
     }
 }

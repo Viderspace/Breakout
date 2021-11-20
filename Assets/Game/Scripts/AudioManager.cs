@@ -1,46 +1,42 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+namespace Game.Scripts
 {
-    #region Inspector + Fields
-
-    [SerializeField] private List<AudioClip> sounds = new List<AudioClip>();
-    
-    private AudioSource _audioSource;
-    
-    #endregion
-    
-    #region Methods
-
-    private AudioClip GetClip(string clipName)
+    public class AudioManager : MonoBehaviour
     {
-        for (var i = 0; i < sounds.Count; i++)
+        #region Inspector + Fields
+
+        [SerializeField] private List<AudioClip> sounds = new List<AudioClip>();
+    
+        private AudioSource _audioSource;
+    
+        #endregion
+    
+        #region Methods
+
+        private AudioClip GetClip(string clipName)
         {
-            if (sounds[i].name == clipName)
-            {
-                return sounds[i];
-            }
+            return sounds.FirstOrDefault(t => t.name == clipName);
         }
 
-        return null;
+        public void PlaySound(string soundName)
+        {
+            var sound = GetClip(soundName);
+            _audioSource.clip = sound;
+            _audioSource.Play();
+        }
+
+        #endregion
+
+        #region MonoBehaviour
+
+        private void Awake()
+        {
+            _audioSource = GetComponent<AudioSource>();
+        }
+
+        #endregion
     }
-
-    public void PlaySound(string soundName)
-    {
-        var sound = GetClip(soundName);
-        _audioSource.clip = sound;
-        _audioSource.Play();
-    }
-
-    #endregion
-
-    #region MonoBehaviour
-
-    private void Awake()
-    {
-        _audioSource = GetComponent<AudioSource>();
-    }
-
-    #endregion
 }
