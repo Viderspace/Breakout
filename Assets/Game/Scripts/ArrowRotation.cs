@@ -6,9 +6,10 @@ namespace Game.Scripts
     {
         #region Fields
 
-        private float _minAngle = -85.0f;
-        private float _maxAngle = 85.0f;
-        private const float Speed = 0.2f;
+        private float _minAngle = -80.0f;
+        private float _maxAngle = 80.0f;
+        
+        private const float Speed = 0.35f;
 
         private float _t;
         private Vector3 _vec;

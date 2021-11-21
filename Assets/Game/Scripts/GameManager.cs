@@ -13,7 +13,6 @@ namespace Game.Scripts
         [SerializeField] private LivesManager livesManager;
         [SerializeField] private Camera mainCam;
         [SerializeField] private AudioManager audioManager;
-        // [SerializeField] private ArrowRotation arrow;
 
         [Header("Game controls")] [SerializeField] [Range(1, 200)]
         public float paddleSpeed = 20f;
@@ -77,8 +76,6 @@ namespace Game.Scripts
             }
         }
 
-        public static GameManager Shared => _shared;
-
         #endregion
 
 
@@ -103,8 +100,9 @@ namespace Game.Scripts
             if (Win || GameOver)
             {
                 ballBehaviour.gameObject.SetActive(true);
-                paddleBehaviour.gameObject.SetActive(false);
+                paddleBehaviour.gameObject.SetActive(true);
             }
+
             GameOver = false;
             Win = false;
             blocksManager.ResetLevel();

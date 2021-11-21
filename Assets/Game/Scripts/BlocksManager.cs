@@ -19,6 +19,9 @@ namespace Game.Scripts
 
         private readonly List<GameObject> _bricks = new List<GameObject>(); // I keep all blocks here
         private float _animationTime;
+        
+        private readonly List<string>[] _colorPallets = new List<string>[] {Colors1, Colors2};
+        private int _pallet = 1;
 
 
         //utilities for the procedural blocks animation
@@ -86,10 +89,11 @@ namespace Game.Scripts
 
             _bricks.Clear();
 
-
+            _pallet = (_pallet + 1) % 2;
             for (var y = 0; y < Rows; y++)
             {
-                var color = GetColorFromString(_rowColors[y]);
+                var color = GetColorFromString(_colorPallets[_pallet][y]);
+                // var color = GetColorFromString(Colors1[y]);
                 for (var x = 0; x < Cols; x++)
                 {
                     var localScale = brickPrefab.transform.localScale;
@@ -145,8 +149,8 @@ namespace Game.Scripts
         #region Color Conversion
 
         // these are the colors i picked:
-        private readonly List<string> _rowColors = new List<string> {"E6F07D", "F0C5BD", "F0A5D5", "C48DF0", "99F0CD"};
-
+        private static readonly List<string> Colors1 = new List<string> {"E6F07D", "F0C5BD", "F0A5D5", "C48DF0", "99F0CD"};
+        private static readonly List<string> Colors2 = new List<string> {"6D4A8F", "D0C8D8", "DB955C", "4F8F2E", "A1DB81"};
 
         // helper functions: 
         private static int HexToDec(string hex)

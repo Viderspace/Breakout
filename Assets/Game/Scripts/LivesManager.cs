@@ -45,7 +45,7 @@ namespace Game.Scripts
 
         public void ReduceLife()
         {
-            // _animationStart = true;
+            
             ReduceLifeAnimation();
             switch (LivesCount)
             {

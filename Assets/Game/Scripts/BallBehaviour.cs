@@ -11,6 +11,7 @@ namespace Game.Scripts
         [SerializeField] private AudioManager audioManager;
         [SerializeField] private Rigidbody2D physics;
 
+
         #endregion
 
 
@@ -18,7 +19,7 @@ namespace Game.Scripts
 
         private readonly Vector3 _initPos = new Vector3(0, -3.5f, 0);
         private float _initSpeed;
-        public bool ballIsActive;
+        [HideInInspector] public bool ballIsActive;
         private Vector2 _prevVelocity;
         private int PaddleHitCount { get; set; }
 
@@ -81,6 +82,7 @@ namespace Game.Scripts
             else
             {
                 physics.velocity = _prevVelocity = arrow.GetVelocity()*_initSpeed;
+                // ballLaunch.Invoke();
                 arrow.gameObject.SetActive(false);
             }
 
@@ -91,6 +93,7 @@ namespace Game.Scripts
 
 
         #region MonoBehaviour
+        
 
         private void Awake()
         {
