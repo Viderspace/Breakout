@@ -13,6 +13,7 @@ namespace Game.Scripts
         [SerializeField] private LivesManager livesManager;
         [SerializeField] private Camera mainCam;
         [SerializeField] private AudioManager audioManager;
+        // [SerializeField] private ArrowRotation arrow;
 
         [Header("Game controls")] [SerializeField] [Range(1, 200)]
         public float paddleSpeed = 20f;
@@ -29,7 +30,7 @@ namespace Game.Scripts
 
         private static GameManager _shared;
         private bool _win;
-
+        private bool _gameOver;
 
         public enum BallSpeedFactor
         {
@@ -48,7 +49,19 @@ namespace Game.Scripts
 
         #region Properties
 
-        public bool GameOver { get; private set; }
+        public bool GameOver
+        {
+            get => _gameOver;
+            private set
+            {
+                _gameOver = value;
+                if (value)
+                {
+                    ballBehaviour.gameObject.SetActive(false);
+                    paddleBehaviour.gameObject.SetActive(false);
+                }
+            }
+        }
 
         public bool Win
         {
@@ -56,13 +69,11 @@ namespace Game.Scripts
             private set
             {
                 _win = value;
-                if (value)
-                {
-                    Debug.Log("Win!");
-                    PauseGame();
-                    audioManager.PlaySound("WIN");
-                    
-                }
+                if (!value) return;
+                Debug.Log("Win!");
+                ballBehaviour.gameObject.SetActive(false);
+                paddleBehaviour.gameObject.SetActive(false);
+                audioManager.PlaySound("WIN");
             }
         }
 
@@ -89,6 +100,11 @@ namespace Game.Scripts
 
         private void InitGame()
         {
+            if (Win || GameOver)
+            {
+                ballBehaviour.gameObject.SetActive(true);
+                paddleBehaviour.gameObject.SetActive(false);
+            }
             GameOver = false;
             Win = false;
             blocksManager.ResetLevel();

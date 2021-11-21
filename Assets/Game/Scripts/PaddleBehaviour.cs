@@ -28,8 +28,9 @@ namespace Game.Scripts
 
         public void InitPosition()
         {
-            transform.position = _initPosition;
             DeactivatePaddle();
+            _rigidbody2D.position = _initPosition;
+            
         }
 
         public void DeactivatePaddle()
@@ -52,20 +53,18 @@ namespace Game.Scripts
             _rigidbody2D = GetComponent<Rigidbody2D>();
             _paddleSpeed = gameManager.paddleSpeed;
         }
-
+        
 
         private void Update()
         {
             if (_currentState == State.Disabled) return;
-
-            _move = Input.GetAxisRaw("Horizontal");
+            _move = Input.GetAxis("Horizontal") * _paddleSpeed;
         }
 
         private void FixedUpdate()
         {
             if (_currentState == State.Disabled) return;
-
-            _rigidbody2D.AddForce(new Vector2(_move * _paddleSpeed, 0));
+            _rigidbody2D.AddForce(new Vector2(_move, 0));
         }
 
         #endregion

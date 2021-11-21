@@ -1,5 +1,4 @@
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Game.Scripts
 {
@@ -8,6 +7,7 @@ namespace Game.Scripts
         #region Inspector
 
         [SerializeField] private GameManager gameManager;
+        [SerializeField] private ArrowRotation arrow;
         [SerializeField] private AudioManager audioManager;
         [SerializeField] private Rigidbody2D physics;
 
@@ -57,17 +57,12 @@ namespace Game.Scripts
         {
             transform.position = _initPos;
             physics.velocity = _prevVelocity = new Vector2(0, 0);
+            arrow.gameObject.SetActive(true);
             PaddleHitCount = 0;
             gameManager.ballSpeedFactor = GameManager.BallSpeedFactor.Original;
             ballIsActive = false;
         }
-
-        private Vector2 RandomDirection()
-        {
-            var xRand = Random.Range(-0.99f, 0.99f);
-            var yRand = Mathf.Sqrt(1 - xRand);
-            return new Vector2(xRand, yRand).normalized * _initSpeed;
-        }
+        
 
         public void PauseBall()
         {
@@ -85,7 +80,8 @@ namespace Game.Scripts
             }
             else
             {
-                physics.velocity = _prevVelocity = RandomDirection();
+                physics.velocity = _prevVelocity = arrow.GetVelocity()*_initSpeed;
+                arrow.gameObject.SetActive(false);
             }
 
             ballIsActive = true;
